@@ -6,7 +6,7 @@
 
 -Chainable methods
 
--Ability to define ypur own actions/roles/resources
+-Ability to define your own actions/roles/resources
 
 -Error handling
 
