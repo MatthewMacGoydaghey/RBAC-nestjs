@@ -1,7 +1,7 @@
 import { Role } from "./types"
 import { AccessInfo, RoleObject } from "./interfaces"
 
-export class RoleBuilder {
+export class RBACBuilder {
 public roles: RoleObject[] = []
 private role: Role
 
@@ -56,4 +56,4 @@ private handleReEntry(roleObj: RoleObject, accessInfo: AccessInfo[]) {
 }
 
 
-export const roleBuilder: RoleBuilder = new RoleBuilder()
+export const roleBuilder: RBACBuilder = new RBACBuilder()

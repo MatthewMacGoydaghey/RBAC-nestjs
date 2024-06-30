@@ -3,7 +3,6 @@ import { Observable } from "rxjs";
 import { AccessInfo, AccessInfoDecorator } from "./interfaces";
 import { ACCESS_INFO_KEY } from "./decorators";
 import { Reflector } from "@nestjs/core";
-import { Role } from "./types";
 import { roleBuilder } from "./rbacBuilder";
 
 
@@ -23,7 +22,9 @@ getLessons() {
 */
 
 // By default guard checks 'user.roles' property in request body, you can change it to your own property in this variable:
-const userRoelsProperty = 'user.roles'
+const userRolesProperty = 'roles'
+// And if you keep roles as objects in DB table and it has additional property for value. This variable is undefiend by default.
+const userRolesObjectValueProperty = 'value'
 
 
 @Injectable()
@@ -39,9 +40,9 @@ export class RBACGuard implements CanActivate {
       ])
     
     const request = context.switchToHttp().getRequest()
-    const userRoles = request.$[userRoelsProperty] as Role[]
+    const userRoles = request.user[userRolesProperty]
     if (!userRoles) {
-      throw new ForbiddenException({message: 'Request value `user` or `user.roles` not found'})
+      throw new ForbiddenException({message: `Request property ${userRolesProperty} not found`})
     }
     const userAccessInfo = checkAccessToResource(requestAccessInfo, userRoles) as AccessInfo
     return checkAccessToAction(userAccessInfo, requestAccessInfo)
@@ -52,13 +53,13 @@ export class RBACGuard implements CanActivate {
 
 
 
-function checkAccessToResource(requestAccessInfo: AccessInfoDecorator, userRoles: Role[] ) {
+function checkAccessToResource(requestAccessInfo: AccessInfoDecorator, userRoles: any ) {
   try {
     const roles = roleBuilder.roles
   let hasAccess: boolean = false
   let accesInfo: AccessInfo | undefined = undefined
   for (let role of userRoles) {
-    const roleObj = roles.find((obj) => obj.roleName === role)
+    const roleObj = roles.find((obj) => obj.roleName === (role[userRolesObjectValueProperty] ?? role))
     if (!roleObj) {
       continue
     }
