@@ -21,10 +21,10 @@ getLessons() {
 }
 */
 
-// By default guard checks 'user.roles' property in request body, you can change it to your own property in this variable:
+// By default guard checks 'roles' property inside 'request.user' object, you can change it to your own property in this variable:
 const userRolesProperty = 'roles'
 // And if you keep roles as objects in DB table and it has additional property for value. This variable is undefiend by default.
-const userRolesObjectValueProperty = 'value'
+const userRolesObjectValueProperty = undefined
 
 
 @Injectable()
