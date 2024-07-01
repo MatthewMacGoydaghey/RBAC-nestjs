@@ -1,4 +1,4 @@
-import { Action, Resource, Role } from "./types"
+import { Action, Resource, Role } from "./config"
 import { AccessInfo, RoleObject } from "./interfaces"
 
 export class RBACManager {
@@ -33,7 +33,7 @@ extendAccess(fromRole: Role) {
 }
 
 
-allowedAny(roles: Role[], resource: Resource, action: Action) {
+allowedAny(roles: Role[], resource: Resource, action: Action): Boolean {
   for (let role of roles) {
   const foundRole = this.findRole(role)
   const resourceAcesses = foundRole.accessInfo.find((obj) => obj.resource === resource)
@@ -44,6 +44,7 @@ allowedAny(roles: Role[], resource: Resource, action: Action) {
   }
   return false
 }
+
 
 private findRole(roleName: string) {
   const roleObject = this.roles.find((obj) => obj.roleName === roleName)

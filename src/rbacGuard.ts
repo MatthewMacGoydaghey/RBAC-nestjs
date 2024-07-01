@@ -4,12 +4,12 @@ import { AccessInfo, AccessInfoDecorator } from "./interfaces";
 import { ACCESS_INFO_KEY } from "./decorators";
 import { Reflector } from "@nestjs/core";
 import { rbacManager } from "./rbacManager";
-import { Role } from "./types";
+import { Role, userRolesProperty } from "./config";
 
 
 /*
 Must be defined after user authtentication and defining access info for the route
-Using example:
+Usage example:
 
 @UseGuard(AuthGuard)
 @AccessInfo({
@@ -21,9 +21,6 @@ getLessons() {
   return this.lessonsService.getLessons()
 }
 */
-
-// By default guard checks 'roles' property inside 'request.user' object, you can change it to your own property in this variable:
-const userRolesProperty = 'roles'
 
 
 @Injectable()
@@ -53,23 +50,17 @@ export class RBACGuard implements CanActivate {
 
 function checkAccessToResource(requestAccessInfo: AccessInfoDecorator, userRoles: Role[] ) {
   try {
-    const roles = rbacManager.roles
+  const roles = rbacManager.roles
   let accesInfo: AccessInfo | undefined = undefined
   for (let role of userRoles) {
     const roleObj = roles.find((obj) => obj.roleName === role)
-    if (!roleObj) {
-      continue
-    }
+    if (!roleObj) continue
     accesInfo = roleObj.accessInfo.find((obj) => obj.resource === requestAccessInfo.resource)
     if (accesInfo) {
       for (let action of accesInfo.actions) {
-        if (action[0].includes(requestAccessInfo.action) || action[0].includes('all')) {
-          return true
-        }
+        if (action[0].includes(requestAccessInfo.action) || action[0].includes('all')) return true
       }
-    } else {
-      throw new ForbiddenException({message: 'You dont have enough rights to use this resource'})
-    }
+    } else throw new ForbiddenException({message: 'You dont have enough rights to use this resource'})
   }
     throw new ForbiddenException({message: 'You dont have access to this resource'})
   } catch (err) {

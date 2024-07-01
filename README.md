@@ -1,6 +1,6 @@
 # RBAC libarary for NestJS
 
--TypeScript support
+-Written in TypeScript
 
 -Decorator-based
 

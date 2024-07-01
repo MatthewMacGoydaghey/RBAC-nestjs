@@ -1,4 +1,5 @@
-import { Action, Resource } from "./types"
+import { Action, Resource } from "./config"
+
 
 
 
