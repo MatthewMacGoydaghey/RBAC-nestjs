@@ -83,7 +83,7 @@ function checkAccessToResource(requestAccessInfo: AccessInfoDecorator, userRoles
 
   function checkAccessToAction(userAccessInfo: AccessInfo, requestAccessInfo: AccessInfoDecorator) {
     for (let action of userAccessInfo.actions) {
-      if (action[0].includes(requestAccessInfo.action[0]) || action[0].includes('all')) {
+      if (action[0].includes(requestAccessInfo.action) || action[0].includes('all')) {
         return true
       }
     }
