@@ -3,7 +3,8 @@ import { Observable } from "rxjs";
 import { AccessInfo, AccessInfoDecorator } from "./interfaces";
 import { ACCESS_INFO_KEY } from "./decorators";
 import { Reflector } from "@nestjs/core";
-import { roleBuilder } from "./rbacBuilder";
+import { rbacManager } from "./rbacManager";
+import { Role } from "./types";
 
 
 /*
@@ -23,8 +24,6 @@ getLessons() {
 
 // By default guard checks 'roles' property inside 'request.user' object, you can change it to your own property in this variable:
 const userRolesProperty = 'roles'
-// And if you keep roles as objects in DB table and it has additional property for value. This variable is undefiend by default.
-const userRolesObjectValueProperty = undefined
 
 
 @Injectable()
@@ -53,13 +52,13 @@ export class RBACGuard implements CanActivate {
 
 
 
-function checkAccessToResource(requestAccessInfo: AccessInfoDecorator, userRoles: any ) {
+function checkAccessToResource(requestAccessInfo: AccessInfoDecorator, userRoles: Role[] ) {
   try {
-    const roles = roleBuilder.roles
+    const roles = rbacManager.roles
   let hasAccess: boolean = false
   let accesInfo: AccessInfo | undefined = undefined
   for (let role of userRoles) {
-    const roleObj = roles.find((obj) => obj.roleName === (role[userRolesObjectValueProperty] ?? role))
+    const roleObj = roles.find((obj) => obj.roleName === role)
     if (!roleObj) {
       continue
     }
@@ -84,7 +83,7 @@ function checkAccessToResource(requestAccessInfo: AccessInfoDecorator, userRoles
 
   function checkAccessToAction(userAccessInfo: AccessInfo, requestAccessInfo: AccessInfoDecorator) {
     for (let action of userAccessInfo.actions) {
-      if (action.includes(requestAccessInfo.action) || action.includes('all')) {
+      if (action[0].includes(requestAccessInfo.action[0]) || action[0].includes('all')) {
         return true
       }
     }

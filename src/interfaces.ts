@@ -4,7 +4,7 @@ import { Action, Resource } from "./types"
 
 export interface AccessInfo {
   resource: Resource
-  actions: Action[]
+  actions: [Action, 'own' | 'any'][]
 }
 
 export interface AccessInfoDecorator {

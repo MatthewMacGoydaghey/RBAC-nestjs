@@ -1,7 +1,7 @@
-import { Role } from "./types"
+import { Action, Resource, Role } from "./types"
 import { AccessInfo, RoleObject } from "./interfaces"
 
-export class RBACBuilder {
+export class RBACBManager {
 public roles: RoleObject[] = []
 private role: Role
 
@@ -11,9 +11,7 @@ insertRole (roleName: Role) {
     accessInfo: []
   }
   const duplicate = this.roles.find((obj) => obj.roleName === roleName)
-  if (duplicate) {
-    throw new Error(`Role ${roleName} already exists`)
-  }
+  if (duplicate) throw new Error(`Role ${roleName} already exists`)
   this.role = roleName
   this.roles.push(Role)
   return this
@@ -34,11 +32,17 @@ extendAccess(fromRole: Role) {
   return this
 }
 
+
+allowedAny(roleName: Role, resource: Resource, action: Action) {
+  const foundRole = this.findRole(roleName)
+  const resourceAcesses = foundRole.accessInfo.find((obj) => obj.resource === resource)
+  if (!resourceAcesses) return false
+  return resourceAcesses.actions.some((obj) => obj[1] === 'any')
+}
+
 private findRole(roleName: string) {
   const roleObject = this.roles.find((obj) => obj.roleName === roleName)
-  if (!roleObject) {
-    throw new Error(`Role ${roleName} not found`)
-  }
+  if (!roleObject) throw new Error(`Role ${roleName} not found`)
   return roleObject
 }
 
@@ -47,13 +51,12 @@ private handleReEntry(roleObj: RoleObject, accessInfo: AccessInfo[]) {
   const inResources = accessInfo.map((obj) => obj.resource)
   roleObj.accessInfo.forEach((obj) => {
     for (let inResource of inResources) {
-      if (inResource.includes(obj.resource)) {
-      roleObj.accessInfo = roleObj.accessInfo.filter((obj) => obj.resource !== inResource)
-      }
+      if (inResource.includes(obj.resource)) 
+        roleObj.accessInfo = roleObj.accessInfo.filter((obj) => obj.resource !== inResource)
     }
   })
 }
 }
 
 
-export const roleBuilder: RBACBuilder = new RBACBuilder()
+export const rbacManager: RBACBManager = new RBACBManager()

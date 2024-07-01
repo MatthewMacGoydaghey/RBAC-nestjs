@@ -6,11 +6,14 @@
 
 -Chainable methods
 
+-Possesion status verification
+
 -Ability to define your own actions/roles/resources
 
 -Error handling
 
 -Simple in use
+
 
 
 
