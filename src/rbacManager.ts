@@ -1,7 +1,7 @@
 import { Action, Resource, Role } from "./types"
 import { AccessInfo, RoleObject } from "./interfaces"
 
-export class RBACBManager {
+export class RBACManager {
 public roles: RoleObject[] = []
 private role: Role
 
@@ -37,7 +37,8 @@ allowedAny(roleName: Role, resource: Resource, action: Action) {
   const foundRole = this.findRole(roleName)
   const resourceAcesses = foundRole.accessInfo.find((obj) => obj.resource === resource)
   if (!resourceAcesses) return false
-  return resourceAcesses.actions.some((obj) => obj[1] === 'any')
+  const actionAccess = resourceAcesses.actions.find((obj) => obj[0] === action)
+  return actionAccess[1] === 'any'
 }
 
 private findRole(roleName: string) {
@@ -59,4 +60,4 @@ private handleReEntry(roleObj: RoleObject, accessInfo: AccessInfo[]) {
 }
 
 
-export const rbacManager: RBACBManager = new RBACBManager()
+export const rbacManager: RBACManager = new RBACManager()
