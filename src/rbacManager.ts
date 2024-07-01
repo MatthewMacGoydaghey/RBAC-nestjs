@@ -33,12 +33,16 @@ extendAccess(fromRole: Role) {
 }
 
 
-allowedAny(roleName: Role, resource: Resource, action: Action) {
-  const foundRole = this.findRole(roleName)
+allowedAny(roles: Role[], resource: Resource, action: Action) {
+  for (let role of roles) {
+  const foundRole = this.findRole(role)
   const resourceAcesses = foundRole.accessInfo.find((obj) => obj.resource === resource)
-  if (!resourceAcesses) return false
-  const actionAccess = resourceAcesses.actions.find((obj) => obj[0] === action)
+  if (!resourceAcesses) continue
+  const actionAccess = resourceAcesses.actions.find((obj) => obj[0] === action || obj[0] == 'all')
+  if (!actionAccess) continue
   return actionAccess[1] === 'any'
+  }
+  return false
 }
 
 private findRole(roleName: string) {
