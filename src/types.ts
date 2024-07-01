@@ -6,4 +6,4 @@ export type Action = 'all' | 'read' | 'create' | 'update' | 'delete'
 
 export type Role = 'user' | 'editor' | 'admin'
 
-export type Resource = 'articles'
+export type Resource = 'articles' | 'users'

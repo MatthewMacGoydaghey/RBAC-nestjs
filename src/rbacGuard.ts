@@ -43,8 +43,7 @@ export class RBACGuard implements CanActivate {
     if (!userRoles) {
       throw new ForbiddenException({message: `Request property ${userRolesProperty} not found`})
     }
-    const userAccessInfo = checkAccessToResource(requestAccessInfo, userRoles) as AccessInfo
-    return checkAccessToAction(userAccessInfo, requestAccessInfo)
+    return checkAccessToResource(requestAccessInfo, userRoles)
   } catch (err) {
     throw new ForbiddenException({message: err})
   }
@@ -55,7 +54,6 @@ export class RBACGuard implements CanActivate {
 function checkAccessToResource(requestAccessInfo: AccessInfoDecorator, userRoles: Role[] ) {
   try {
     const roles = rbacManager.roles
-  let hasAccess: boolean = false
   let accesInfo: AccessInfo | undefined = undefined
   for (let role of userRoles) {
     const roleObj = roles.find((obj) => obj.roleName === role)
@@ -64,28 +62,17 @@ function checkAccessToResource(requestAccessInfo: AccessInfoDecorator, userRoles
     }
     accesInfo = roleObj.accessInfo.find((obj) => obj.resource === requestAccessInfo.resource)
     if (accesInfo) {
-      hasAccess = true
-      break
+      for (let action of accesInfo.actions) {
+        if (action[0].includes(requestAccessInfo.action) || action[0].includes('all')) {
+          return true
+        }
+      }
+    } else {
+      throw new ForbiddenException({message: 'You dont have enough rights to use this resource'})
     }
   }
-    if (hasAccess) {
-      return accesInfo
-    } else {
-        throw new ForbiddenException({message: 'You dont have access to this resource'})
-    }
+    throw new ForbiddenException({message: 'You dont have access to this resource'})
   } catch (err) {
     throw new ForbiddenException({message: err})
   }
-  
-  }
-
-
-
-  function checkAccessToAction(userAccessInfo: AccessInfo, requestAccessInfo: AccessInfoDecorator) {
-    for (let action of userAccessInfo.actions) {
-      if (action[0].includes(requestAccessInfo.action) || action[0].includes('all')) {
-        return true
-      }
-    }
-    throw new ForbiddenException({message: 'You dont have enough rights to use this resource'})
   }
